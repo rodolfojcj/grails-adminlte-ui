@@ -149,4 +149,54 @@ class AdminLTETagLibSpec extends Specification {
         tagLib.sidebarMenu(scope: 'singleapp', path: 'dummyController/secondAction').toString() == expected
         assert applyTemplate('<altt:sidebarMenu scope="singleapp" path="dummyController/secondAction"/>') == expected
     }
+
+    void "test search form is present in the sidebar, if needed"() {
+        given: "any grails navigation containing zero or more navigation items"
+        def emptyNode = new NavigationItem([
+            linkArgs: [url: '/']
+        ])
+        def grailsNavigation = [:]
+        grailsNavigation.nodesForPath = { String path ->
+            [emptyNode]
+        }
+        grailsNavigation.nodeForId = { String id ->
+            emptyNode
+        }
+        and: "a NavigationTagLib bean"
+        def navTagLib = applicationContext.getBean(NavigationTagLib)
+        and: "the minimal grails navigation is attached to the NavigationTagLib"
+        navTagLib.grailsNavigation = grailsNavigation
+        when: "the search form is needed in the sidebar"
+        then: "the sidebar contains a form called 'sidebar-form' with a button and an awesome icon"
+        def expected = '<section class="sidebar"><form action="#" method="get" class="sidebar-form"><div class="input-group"><input name="q" class="form-control" placeholder="Search..." type="text"><span class="input-group-btn"><button type="submit" name="seach" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i></button></span></div></form><ul class="sidebar-menu"></ul></section>'
+        tagLib.sidebar(withSearchForm: true, scope: 'anyapp', path: 'anypath').toString() == expected
+        tagLib.sidebar(scope: 'anyapp', path: 'anypath').toString() == expected
+        assert applyTemplate('<altt:sidebar withSearchForm="true" scope="anyapp" path="anypath"/>') == expected
+        assert applyTemplate('<altt:sidebar scope="anyapp" path="anypath"/>') == expected
+    }
+
+    void "test search form is absent of the sidebar, if not needed"() {
+        given: "any grails navigation containing zero or more navigation items"
+        def emptyNode = new NavigationItem([
+            linkArgs: [url: '/']
+        ])
+        def grailsNavigation = [:]
+        grailsNavigation.nodesForPath = { String path ->
+            [emptyNode]
+        }
+        grailsNavigation.nodeForId = { String id ->
+            emptyNode
+        }
+        and: "a NavigationTagLib bean"
+        def navTagLib = applicationContext.getBean(NavigationTagLib)
+        and: "the minimal grails navigation is attached to the NavigationTagLib"
+        navTagLib.grailsNavigation = grailsNavigation
+        when: "the search form is not needed in the sidebar"
+        then: "the sidebar contains neither a form called 'sidebar-form' nor a button with an awesome icon"
+        def expected = '<section class="sidebar"><ul class="sidebar-menu"></ul></section>'
+        tagLib.sidebar(withSearchForm: false, scope: 'anyapp', path: 'anypath').toString() == expected
+        tagLib.sidebar(scope: 'anyapp', path: 'anypath').toString() != expected
+        assert applyTemplate('<altt:sidebar withSearchForm="false" scope="anyapp" path="anypath"/>') == expected
+        assert applyTemplate('<altt:sidebar scope="anyapp" path="anypath"/>') != expected
+    }
 }

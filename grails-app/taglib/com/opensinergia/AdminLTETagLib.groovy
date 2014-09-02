@@ -43,4 +43,18 @@ class AdminLTETagLib {
             out << "</li>"
         })
     }
+
+    def sidebarForm = {
+      out << '<form action="#" method="get" class="sidebar-form"><div class="input-group"><input name="q" class="form-control" placeholder="Search..." type="text"><span class="input-group-btn"><button type="submit" name="seach" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i></button></span></div></form>'
+    }
+
+    def sidebar = {attrs, body ->
+        // by default search form will be included, even when not specified
+        def withSearchForm = true && (attrs.withSearchForm == 'true' || attrs.withSearchForm.is(Boolean.TRUE) || attrs.withSearchForm == null)
+        out << '<section class="sidebar">'
+        if (withSearchForm)
+            out << altt.sidebarForm()
+        out << altt.sidebarMenu(attrs, body)
+        out << '</section>'
+    }
 }
