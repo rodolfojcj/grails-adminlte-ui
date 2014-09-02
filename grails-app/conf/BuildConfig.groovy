@@ -18,24 +18,15 @@ grails.project.fork = [
 
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
-    // inherit Grails' default dependencies
     inherits("global") {
-        // uncomment to disable ehcache
-        // excludes 'ehcache'
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
         grailsCentral()
         mavenLocal()
         mavenCentral()
-        // uncomment the below to enable remote dependency resolution
-        // from public Maven repositories
-        //mavenRepo "http://repository.codehaus.org"
-        //mavenRepo "http://download.java.net/maven/2/"
-        //mavenRepo "http://repository.jboss.com/maven2/"
     }
     dependencies {
-        // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
     }
 
@@ -44,5 +35,10 @@ grails.project.dependency.resolution = {
               ":rest-client-builder:1.0.3") {
             export = false
         }
+        //runtime ":twitter-bootstrap:3.2.0.2" // gives problems with <g:paginate>
+        runtime ":jquery-ui:1.10.3"
+        //compile ":font-awesome-resources:4.1.0.2" // gives error Error creating bean with name 'FontAwesomePluginResourceMapperInstance'
+        compile ":platform-core:1.0.0"
+	runtime ":hibernate:3.6.10.9" // https://github.com/grails-plugins/grails-platform-core/issues/14
     }
 }
