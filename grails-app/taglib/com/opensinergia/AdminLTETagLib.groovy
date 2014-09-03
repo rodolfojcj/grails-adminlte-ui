@@ -35,12 +35,37 @@ class AdminLTETagLib {
         // see line 158 of NavigationTagLib.groovy. That's a closure blessing!
         // out << body([item:n, linkArgs:linkArgs, active:active, enabled:enabled])
         out << nav.menu(attrs + [class: "sidebar-menu", custom: true], {menuAttrs ->
-            out << '<li' + (menuAttrs.active ? ' class="active"' : '') + '>'
-            out << p.callTag(tag: 'g:link', attrs: menuAttrs.linkArgs, {
+            if (!menuAttrs.item?.children || menuAttrs.item.children.size() == 0) {
+                out << '<li' + (menuAttrs.active ? ' class="active"' : '') + '>'
+                out << p.callTag(tag: 'g:link', attrs: menuAttrs.linkArgs, {
+                    out << '<i class="fa' + (menuAttrs.item.data?.faIcon ? ' ' + menuAttrs.item.data.faIcon : '') + '"></i>'
+                    out << "<span>" + nav.title(menuAttrs) + "</span>"
+                })
+                out << "</li>"
+            }
+            else if (menuAttrs.item?.children && menuAttrs.item?.children.size() >= 1) {
+                out << '<li class="treeview' + (menuAttrs.active ? ' active' : '') + '">'
+                out << '<a href="#">'
                 out << '<i class="fa' + (menuAttrs.item.data?.faIcon ? ' ' + menuAttrs.item.data.faIcon : '') + '"></i>'
-                out << "<span>" + nav.title(menuAttrs) + "</span>"
-            })
-            out << "</li>"
+                out << ' <span>' + nav.title(menuAttrs) + '</span>'
+                out << '<i class="fa fa-angle-left pull-right"></i>'
+                out << '</a>'
+                out << '<ul class="treeview-menu">'
+                menuAttrs.item.children.each {item ->
+                    // only a max of 2 levels depth hierarchy for the way AdminLTE theme works
+                    // so, no recursive handling for deeper/nested items
+                    out << '<li>'
+                        // clone linkArgs! see line 154 of NavigationTagLib.groovy
+                        out << p.callTag(tag: 'g:link', attrs: new HashMap(item.linkArgs), {
+                            out << '<i class="fa fa-angle-double-right"></i>'
+                            //out << nav.title(item) // it did not work because this is a leaf node
+                            out << item.titleDefault // TODO: see line 290 of NavigationTagLib.groovy using g:message
+                        })
+                    out << '</li>'
+                }
+                out << '</ul>' // </ul> with "treeview-menu" class
+                out << '</li>' // </ul> with "treeview" class
+            }
         })
     }
 

@@ -199,4 +199,45 @@ class AdminLTETagLibSpec extends Specification {
         assert applyTemplate('<altt:sidebar withSearchForm="false" scope="anyapp" path="anypath"/>') == expected
         assert applyTemplate('<altt:sidebar scope="anyapp" path="anypath"/>') != expected
     }
+
+    void "test collapsed deep menu structure is built correctly"() {
+        given: "some menu items in a collapsed hierarchy of two levels"
+        def secondLevelItemTitle = 'Second Level Title'
+        def secondLevelNode = new NavigationItem([
+            name: 'Second Level Entry',
+            linkArgs: [controller: 'DummyController', action: 'secondLevelAction'],
+            titleDefault: secondLevelItemTitle
+        ])
+        def firstLevelItemTitle = 'First Level Title'
+        def firstLevelNode = new NavigationItem([
+            name: 'First Level Entry',
+            linkArgs: [controller: 'DummyController', action: 'firstLevelAction'],
+            titleDefault: firstLevelItemTitle,
+            data: [faIcon: 'fa-first'],
+            children: [secondLevelNode]
+        ])
+        def parentNode = new NavigationItem([
+            linkArgs: [controller: 'DummyController'],
+            children: [firstLevelNode]
+        ])
+        and: "a minimal grails navigation for that hierarchy with the deepest item active"
+        def grailsNavigation = [:]
+        // returned items by nodesForPath are assumed as active
+        grailsNavigation.nodesForPath = { String path ->
+            [parentNode, secondLevelNode]
+        }
+        grailsNavigation.nodeForId = { String id ->
+            parentNode
+        }
+        and: "a NavigationTagLib bean"
+        def navTagLib = applicationContext.getBean(NavigationTagLib)
+        and: "a UiExtensionsTagLib bean"
+        def pTagLib = applicationContext.getBean(UiExtensionsTagLib)
+        when: "the minimal grails navigation is attached to the NavigationTagLib"
+        navTagLib.grailsNavigation = grailsNavigation
+        then: "the sidebarMenu tag builds a collapsed deep menu structure corresponding to those items hierarchy"
+        def expected = '<ul class="sidebar-menu"><li class="treeview"><a href="#"><i class="fa fa-first"></i> <span>' + firstLevelItemTitle + '</span><i class="fa fa-angle-left pull-right"></i></a><ul class="treeview-menu"><li><a href="/dummyController/secondLevelAction"><i class="fa fa-angle-double-right"></i>' + secondLevelItemTitle + '</a></li></ul></li></ul>'
+        tagLib.sidebarMenu(scope: 'deepapp', path: 'deeppath').toString() == expected
+        assert applyTemplate('<altt:sidebarMenu scope="deepapp" path="deeppath"/>') == expected
+    }
 }
