@@ -82,4 +82,34 @@ class AdminLTETagLib {
         out << altt.sidebarMenu(attrs, body)
         out << '</section>'
     }
+
+    def header = {
+	// TODO: does it need to be refactored to use GSP templates?
+        out << """
+<!-- header logo: style can be found in header.less -->
+<header class="header">
+  <a href="${createLink(uri: '/')}" class="logo">
+    <!-- Add the class icon to your logo image or logo icon to add the margining -->
+    ${meta(name:'app.name')}
+  </a>
+  <!-- Header Navbar: style can be found in header.less -->
+  <nav class="navbar navbar-static-top" role="navigation">
+    <!-- Sidebar toggle button-->
+    <a href="#" class="navbar-btn sidebar-toggle" data-toggle="offcanvas" role="button">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </a>
+    <div class="navbar-right">
+      <ul class="nav navbar-nav">
+        <!-- Messages: style can be found in dropdown.less-->
+        <li class="dropdown messages-menu">
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+"""
+    }
 }
