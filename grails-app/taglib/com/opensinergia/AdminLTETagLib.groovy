@@ -83,7 +83,7 @@ class AdminLTETagLib {
         out << '</section>'
     }
 
-    def header = {
+    def header = {attrs ->
 	// TODO: does it need to be refactored to use GSP templates?
         out << """
 <!-- header logo: style can be found in header.less -->
@@ -104,12 +104,39 @@ class AdminLTETagLib {
     <div class="navbar-right">
       <ul class="nav navbar-nav">
         <!-- Messages: style can be found in dropdown.less-->
-        <li class="dropdown messages-menu">
-        </li>
+        ${altt.littleDropdown(liClass: 'messages-menu', faIcon: 'fa-envelope', label: 'label-success', number: attrs.msgNumber)}
+        <!-- Notifications: style can be found in dropdown.less -->
+        ${altt.littleDropdown(liClass: 'notifications-menu', faIcon: 'fa-warning', label: 'label-warning', number: attrs.ntfNumber)}
+        <!-- Tasks: style can be found in dropdown.less -->
+        ${altt.littleDropdown(liClass: 'tasks-menu', faIcon: 'fa-tasks', label: 'label-danger', number: attrs.tskNumber)}
+        <!-- User Account: style can be found in dropdown.less -->
+        ${altt.userDropdown(attrs)}
       </ul>
     </div>
   </nav>
 </header>
+"""
+    }
+
+    def littleDropdown = {attrs ->
+out << """
+<li class="dropdown ${attrs.liClass}">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        <i class="fa ${attrs.faIcon}"></i>
+        <span class="label ${attrs.label}">${attrs.number ?: '0'}</span>
+    </a>
+</li>
+"""
+    }
+
+    def userDropdown = {attrs ->
+out << """
+<li class="dropdown user user-menu">
+<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+    <i class="glyphicon glyphicon-user"></i>
+    <span>${attrs.name ?: ''} <i class="caret"></i></span>
+</a>
+</li>
 """
     }
 }
