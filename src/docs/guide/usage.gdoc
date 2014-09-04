@@ -1,0 +1,24 @@
+First _adminlte-ui_ has to be included in the _plugins_ section of the _grails-app/conf/BuildConfig.groovy_ file of your Grails application, as shown here:
+{code}
+//...
+    plugins {
+        //...
+        runtime ':adminlte-ui:0.1-SNAPSHOT'
+        //...
+    }
+//...
+{code}
+
+Next the _adminlte_ layout has to be used in the _<head>_ section of every view that you can to be embellished with the AdminLTE theme. For example, the beginning of the _grails-app/views/index.gsp_ file of your Grails application would be like this:
+
+{code}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="layout" content="adminlte"/>
+    <title>My Awesome Grails Application with AdminLTE</title>
+</head>
+<!-- more lines of your GSP view will follow -->
+{code}
+
+Note: right now the _adminlte_ layout file only appears within this plugin files.

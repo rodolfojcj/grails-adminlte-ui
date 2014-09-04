@@ -17,7 +17,7 @@ The Grails Platform Core plugin is also used to generate the navigation menu.
 '''
 
     // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/adminlte-ui"
+    def documentation = "https://github.com/rodolfojcj/grails-adminlte-ui"
 
     // Extra (optional) plugin metadata
 
