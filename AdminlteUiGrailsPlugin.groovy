@@ -13,7 +13,7 @@ class AdminlteUiGrailsPlugin {
 This plugin installs AdminLTE, a fully responsive admin template, developed by Almsaeed Studio.
 AdminLTE is based on Bootstrap 3 framework and several plugins to offer a very nice UI.
 It supports the major web browsers known in the world.
-The Grails Platform Core is also used to generate the navigation menu.
+The Grails Platform Core plugin is also used to generate the navigation menu.
 '''
 
     // URL to the plugin's documentation
