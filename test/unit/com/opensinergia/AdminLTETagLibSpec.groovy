@@ -150,6 +150,46 @@ class AdminLTETagLibSpec extends Specification {
         assert applyTemplate('<altt:sidebarMenu scope="singleapp" path="dummyController/secondAction"/>') == expected
     }
 
+    void "test user panel is present in the sidebar"() {
+        given: "any grails navigation containing zero or more navigation items"
+        def emptyNode = new NavigationItem([
+            linkArgs: [url: '/']
+        ])
+        def grailsNavigation = [:]
+        grailsNavigation.nodesForPath = { String path ->
+            [emptyNode]
+        }
+        grailsNavigation.nodeForId = { String id ->
+            emptyNode
+        }
+        and: "a NavigationTagLib bean"
+        def navTagLib = applicationContext.getBean(NavigationTagLib)
+        and: "the minimal grails navigation is attached to the NavigationTagLib"
+        and: 'a user name'
+        def userName = 'John Doe'
+        and: 'a user image path'
+        def imgPath = 'images/johnDoe.jpg'
+        and: 'a greeting message'
+        def greeting = 'Hello, ' + userName
+        navTagLib.grailsNavigation = grailsNavigation
+        when: "the sidebar is rendered"
+        then: "the sidebar contains a user panel showing that image and that greeting message"
+        def userPanelPattern = /(?ms)/ +
+            /.*<section class="sidebar">.*/ +
+            /.*<div class="user-panel">.*/ +
+            /.*\s<div class="pull-left image">.*/ +
+            /.*\s<img src="${imgPath}" class="img-circle" alt="User Image" \/>.*/ +
+            /.*\s<\/div>.*/ +
+            /.*\s<div class="pull-left info">.*/ +
+            /.*\s<p>${greeting}<\/p>.*/ +
+            /.*\s<a href="#"><i class="fa fa-circle text-success"><\/i> Online<\/a>.*/ +
+            /.*\s<\/div>.*/ +
+            /.*<\/div>.*/ +
+            /.*<\/section>/
+        (tagLib.sidebar(scope: 'anyapp', path: 'anypath', userImage: imgPath, userGreeting: greeting).toString() =~ userPanelPattern).size() == 1
+        (applyTemplate("<altt:sidebar scope='anyapp' path='anypath' userImage='${imgPath}' userGreeting='${greeting}' />") =~ userPanelPattern).size() == 1
+    }
+
     void "test search form is present in the sidebar, if needed"() {
         given: "any grails navigation containing zero or more navigation items"
         def emptyNode = new NavigationItem([
@@ -168,11 +208,24 @@ class AdminLTETagLibSpec extends Specification {
         navTagLib.grailsNavigation = grailsNavigation
         when: "the search form is needed in the sidebar"
         then: "the sidebar contains a form called 'sidebar-form' with a button and an awesome icon"
-        def expected = '<section class="sidebar"><form action="#" method="get" class="sidebar-form"><div class="input-group"><input name="q" class="form-control" placeholder="Search..." type="text"><span class="input-group-btn"><button type="submit" name="seach" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i></button></span></div></form><ul class="sidebar-menu"></ul></section>'
-        tagLib.sidebar(withSearchForm: true, scope: 'anyapp', path: 'anypath').toString() == expected
-        tagLib.sidebar(scope: 'anyapp', path: 'anypath').toString() == expected
-        assert applyTemplate('<altt:sidebar withSearchForm="true" scope="anyapp" path="anypath"/>') == expected
-        assert applyTemplate('<altt:sidebar scope="anyapp" path="anypath"/>') == expected
+        def searchFormPattern = /(?ms)/ +
+            /<section class="sidebar">.*/ +
+            /.*<form action="#" method="get" class="sidebar-form">.*/ +
+            /.*\s<div class="input-group">.*/ +
+            /.*\s<input name="q" class="form-control" placeholder="Search..." type="text">.*/ +
+            /.*\s<span class="input-group-btn">.*/ +
+            /.*\s<button type="submit" name="seach" id="search-btn" class="btn btn-flat">.*/ +
+            /.*\s<i class="fa fa-search"><\/i>.*/ +
+            /.*\s<\/button>.*/ +
+            /.*\s<\/span>.*/ +
+            /.*\s<\/div>.*/ +
+            /.*<\/form>.*/ +
+            /.*<ul class="sidebar-menu"><\/ul>.*/ +
+            /.<\/section>.*/
+        (tagLib.sidebar(withSearchForm: true, scope: 'anyapp', path: 'anypath').toString() =~ searchFormPattern).size() == 1
+        (tagLib.sidebar(scope: 'anyapp', path: 'anypath').toString() =~ searchFormPattern).size() == 1
+        (applyTemplate('<altt:sidebar withSearchForm="true" scope="anyapp" path="anypath"/>') =~ searchFormPattern).size() == 1
+        (applyTemplate('<altt:sidebar scope="anyapp" path="anypath"/>') =~ searchFormPattern).size() == 1
     }
 
     void "test search form is absent of the sidebar, if not needed"() {
@@ -193,11 +246,16 @@ class AdminLTETagLibSpec extends Specification {
         navTagLib.grailsNavigation = grailsNavigation
         when: "the search form is not needed in the sidebar"
         then: "the sidebar contains neither a form called 'sidebar-form' nor a button with an awesome icon"
-        def expected = '<section class="sidebar"><ul class="sidebar-menu"></ul></section>'
-        tagLib.sidebar(withSearchForm: false, scope: 'anyapp', path: 'anypath').toString() == expected
-        tagLib.sidebar(scope: 'anyapp', path: 'anypath').toString() != expected
-        assert applyTemplate('<altt:sidebar withSearchForm="false" scope="anyapp" path="anypath"/>') == expected
-        assert applyTemplate('<altt:sidebar scope="anyapp" path="anypath"/>') != expected
+        def searchFormPattern = /(?ms)/ +
+            /<section class="sidebar">.*/ +
+            /.*<form action="#" method="get" class="sidebar-form">.*/ +
+            /.*<\/form>.*/ +
+            /.*<ul class="sidebar-menu"><\/ul>.*/ +
+            /.<\/section>.*/
+        (tagLib.sidebar(withSearchForm: false, scope: 'anyapp', path: 'anypath').toString() =~ searchFormPattern).size() == 0
+        (tagLib.sidebar(scope: 'anyapp', path: 'anypath').toString() =~ searchFormPattern).size() == 1
+        (applyTemplate('<altt:sidebar withSearchForm="false" scope="anyapp" path="anypath"/>') =~ searchFormPattern).size() == 0
+        (applyTemplate('<altt:sidebar scope="anyapp" path="anypath"/>') =~ searchFormPattern).size() == 1
     }
 
     void "test collapsed deep menu structure is built correctly"() {
@@ -239,5 +297,102 @@ class AdminLTETagLibSpec extends Specification {
         def expected = '<ul class="sidebar-menu"><li class="treeview"><a href="#"><i class="fa fa-first"></i> <span>' + firstLevelItemTitle + '</span><i class="fa fa-angle-left pull-right"></i></a><ul class="treeview-menu"><li><a href="/dummyController/secondLevelAction"><i class="fa fa-angle-double-right"></i>' + secondLevelItemTitle + '</a></li></ul></li></ul>'
         tagLib.sidebarMenu(scope: 'deepapp', path: 'deeppath').toString() == expected
         assert applyTemplate('<altt:sidebarMenu scope="deepapp" path="deeppath"/>') == expected
+    }
+
+    void "test header contains the toggle sidebar button"() {
+        expect: "toggle pattern matches returned header"
+        def togglePattern = /(?ms)/ +
+            /<header class="header">.*/ +
+            /.*<a href="#" class="navbar-btn sidebar-toggle" data-toggle="offcanvas" role="button">.*/ +
+            /.*\s<span class="sr-only">Toggle navigation<\/span>.*/ +
+            /.*\s<span class="icon-bar"><\/span>.*/ +
+            /.*\s<span class="icon-bar"><\/span>.*/ +
+            /.*\s<span class="icon-bar"><\/span>.*/ +
+            /.*<\/a>.*/ +
+            /<\/header>/
+        (tagLib.header().toString() =~ togglePattern).size() == 1
+        (applyTemplate('<altt:header />') =~ togglePattern).size() == 1
+    }
+
+    void "test header contains logo and link to home"() {
+        expect: "logo and link pattern matches returned header"
+        def logoAndLinkPattern = /(?ms)/ +
+            /.*<header class="header">.*/ +
+            /.*\s<a href="\/" class="logo">.*/ +
+            /.*\s<\/a>.*/ +
+            /<\/header>.*/
+        (tagLib.header().toString() =~ logoAndLinkPattern).size() == 1
+        (applyTemplate('<altt:header />') =~ logoAndLinkPattern).size() == 1
+    }
+
+    void "test user dropdown in header shows an empty name when the user name is null"() {
+        expect: "an empty name is rendered for a null user name"
+        def emptyUserNamePattern = /(?ms)/ +
+            /.*<header class="header">.*/ +
+            /.*<li class="dropdown user user-menu">.*/ +
+            /.*\s<a href="#" class="dropdown-toggle" data-toggle="dropdown">.*/ +
+            /.*\s<i class="glyphicon glyphicon-user"><\/i>.*/ +
+            /.*\s<span> <i class="caret"><\/i><\/span>.*/ +
+            /.*<\/a>.*/ +
+            /.*<\/li>.*/ +
+            /<\/header>.*/
+        (tagLib.header().toString() =~ emptyUserNamePattern).size() == 1
+        (applyTemplate('<altt:header />') =~ emptyUserNamePattern).size() == 1
+    }
+
+    void "test user dropdown in header shows the user name when it has a valid value"() {
+        given: "a valid user name"
+        def name = 'John Doe'
+        expect: "a valid name is rendered when it has a value"
+        def validUserNamePattern = /(?ms)/ +
+            /.*<header class="header">.*/ +
+            /.*<li class="dropdown user user-menu">.*/ +
+            /.*\s<a href="#" class="dropdown-toggle" data-toggle="dropdown">.*/ +
+            /.*\s<i class="glyphicon glyphicon-user"><\/i>.*/ +
+            /.*\s<span>${name} <i class="caret"><\/i><\/span>.*/ +
+            /.*<\/a>.*/ +
+            /.*<\/li>.*/ +
+            /<\/header>.*/
+        (tagLib.header(userName: name).toString() =~ validUserNamePattern).size() == 1
+        (applyTemplate("<altt:header userName='${name}' />") =~ validUserNamePattern).size() == 1
+    }
+
+    void "test little dropdown in header renders fine"() {
+        given: "several params for a little dropdown"
+        def liClass = 'tasks-menu'
+        def faIcon = 'fa-tasks'
+        def label = 'label-danger'
+        def number = '11'
+        expect: "a rendered dropdown containing the right values"
+        def littleDropdownPattern = /(?ms)/ +
+            /.*<header class="header">.*/ +
+            /.*<li class="dropdown ${liClass}">/ +
+            /.*\s<a href="#" class="dropdown-toggle" data-toggle="dropdown">.*/ +
+            /.*\s<i class="fa ${faIcon}"><\/i>.*/ +
+            /.*\s<span class="label ${label}">${number}<\/span>.*/ +
+            /.*<\/a>.*/ +
+            /.*<\/li>.*/ +
+            /<\/header>.*/
+        (tagLib.header(tskNumber: number).toString() =~ littleDropdownPattern).size() == 1
+        (applyTemplate("<altt:header tskNumber='${number}' />") =~ littleDropdownPattern).size() == 1
+    }
+
+    void "test all of little dropdowns in header are absent when not needed"() {
+        expect: "a header with no little dropdowns"
+        def littleDropdownPattern = /(?ms)/ +
+            /<header class="header">.*/ +
+            /.*<li class="dropdown \b.+?\b">.*/ +
+            /.*\s<a href="#" class="dropdown-toggle" data-toggle="dropdown">.*/ +
+            /.*\s<i class="fa \b.+?\b"><\/i>.*/ +
+            /.*\s<span class="label \b.+?\b">\d+<\/span>.*/ +
+            /.*<\/a>.*/ +
+            /.*<\/li>.*/ +
+            /<\/header>/
+        (tagLib.header(withLittleDropdowns: false).toString() =~ littleDropdownPattern).size() == 0
+        (tagLib.header(withLittleDropdowns: true).toString() =~ littleDropdownPattern).size() == 1
+        (tagLib.header().toString() =~ littleDropdownPattern).size() == 1
+        (applyTemplate('<altt:header withLittleDropdowns="false" />') =~ littleDropdownPattern).size() == 0
+        (applyTemplate('<altt:header withLittleDropdowns="true" />') =~ littleDropdownPattern).size() == 1
+        (applyTemplate('<altt:header />') =~ littleDropdownPattern).size() == 1
     }
 }

@@ -31,6 +31,7 @@ class AdminLTETagLib {
     //    out << nav.menu(attrs + [class: "sidebar-menu"])
     //}
 
+    // TODO: evaluate a possible refactoring using a GSP template
     def sidebarMenu = {attrs, body ->
         // see line 158 of NavigationTagLib.groovy. That's a closure blessing!
         // out << body([item:n, linkArgs:linkArgs, active:active, enabled:enabled])
@@ -69,74 +70,48 @@ class AdminLTETagLib {
         })
     }
 
-    def sidebarForm = {
-      out << '<form action="#" method="get" class="sidebar-form"><div class="input-group"><input name="q" class="form-control" placeholder="Search..." type="text"><span class="input-group-btn"><button type="submit" name="seach" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i></button></span></div></form>'
-    }
-
     def sidebar = {attrs, body ->
         // by default search form will be included, even when not specified
         def withSearchForm = true && (attrs.withSearchForm == 'true' || attrs.withSearchForm.is(Boolean.TRUE) || attrs.withSearchForm == null)
-        out << '<section class="sidebar">'
+        out << '<section class="sidebar">\n'
+        out << g.render(template: '/adminlte_tmpl/userPanel',
+            model: [userImage: attrs.userImage, userGreeting: attrs.userGreeting ?: 'Welcome'])
         if (withSearchForm)
-            out << altt.sidebarForm()
+            out <<  g.render(template: "/adminlte_tmpl/sidebarForm")
         out << altt.sidebarMenu(attrs, body)
-        out << '</section>'
+        out << '\n' + '</section>'
     }
 
+	// TODO: does it need to be refactored to use a GSP template?
     def header = {attrs ->
-	// TODO: does it need to be refactored to use GSP templates?
+        // by default little dropdowns will be included, even when not specified
+        def withLittleDropdowns = true && (attrs.withLittleDropdowns == 'true' || attrs.withLittleDropdowns.is(Boolean.TRUE) || attrs.withLittleDropdowns == null)
         out << """
 <!-- header logo: style can be found in header.less -->
 <header class="header">
-  <a href="${createLink(uri: '/')}" class="logo">
-    <!-- Add the class icon to your logo image or logo icon to add the margining -->
-    ${meta(name:'app.name')}
-  </a>
-  <!-- Header Navbar: style can be found in header.less -->
-  <nav class="navbar navbar-static-top" role="navigation">
-    <!-- Sidebar toggle button-->
-    <a href="#" class="navbar-btn sidebar-toggle" data-toggle="offcanvas" role="button">
-      <span class="sr-only">Toggle navigation</span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
+    <a href="${createLink(uri: '/')}" class="logo">
+        <!-- Add the class icon to your logo image or logo icon to add the margining -->
+        ${meta(name:'app.name')}
     </a>
-    <div class="navbar-right">
-      <ul class="nav navbar-nav">
-        <!-- Messages: style can be found in dropdown.less-->
-        ${altt.littleDropdown(liClass: 'messages-menu', faIcon: 'fa-envelope', label: 'label-success', number: attrs.msgNumber)}
-        <!-- Notifications: style can be found in dropdown.less -->
-        ${altt.littleDropdown(liClass: 'notifications-menu', faIcon: 'fa-warning', label: 'label-warning', number: attrs.ntfNumber)}
-        <!-- Tasks: style can be found in dropdown.less -->
-        ${altt.littleDropdown(liClass: 'tasks-menu', faIcon: 'fa-tasks', label: 'label-danger', number: attrs.tskNumber)}
-        <!-- User Account: style can be found in dropdown.less -->
-        ${altt.userDropdown(attrs)}
-      </ul>
-    </div>
-  </nav>
+    <!-- Header Navbar: style can be found in header.less -->
+    <nav class="navbar navbar-static-top" role="navigation">
+        ${g.render(template: '/adminlte_tmpl/sidebarToggle')}
+        <div class="navbar-right">
+            <ul class="nav navbar-nav">"""
+        def littleDropdowns = [
+            [liClass: 'messages-menu', faIcon: 'fa-envelope', label: 'label-success', number: attrs.msgNumber, comment: '<!-- Messages: style can be found in dropdown.less-->'],
+            [liClass: 'notifications-menu', faIcon: 'fa-warning', label: 'label-warning', number: attrs.ntfNumber, comment: '<!-- Notifications: style can be found in dropdown.less -->'],
+            [liClass: 'tasks-menu', faIcon: 'fa-tasks', label: 'label-danger', number: attrs.tskNumber, comment: '<!-- Tasks: style can be found in dropdown.less -->']
+        ]
+        withLittleDropdowns && littleDropdowns.each{lD ->
+           out << g.render(template: '/adminlte_tmpl/littleDropdown', model: lD)
+        }
+        out <<  g.render(template: '/adminlte_tmpl/userDropdown', model: [userName: attrs.userName])
+        out << """
+            </ul>
+        </div>
+    </nav>
 </header>
-"""
-    }
-
-    def littleDropdown = {attrs ->
-out << """
-<li class="dropdown ${attrs.liClass}">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-        <i class="fa ${attrs.faIcon}"></i>
-        <span class="label ${attrs.label}">${attrs.number ?: '0'}</span>
-    </a>
-</li>
-"""
-    }
-
-    def userDropdown = {attrs ->
-out << """
-<li class="dropdown user user-menu">
-<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-    <i class="glyphicon glyphicon-user"></i>
-    <span>${attrs.name ?: ''} <i class="caret"></i></span>
-</a>
-</li>
 """
     }
 }
