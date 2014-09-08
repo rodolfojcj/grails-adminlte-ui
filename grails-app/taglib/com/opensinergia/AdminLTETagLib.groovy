@@ -99,9 +99,15 @@ class AdminLTETagLib {
         <div class="navbar-right">
             <ul class="nav navbar-nav">"""
         def littleDropdowns = [
-            [liClass: 'messages-menu', faIcon: 'fa-envelope', label: 'label-success', number: attrs.msgNumber, comment: '<!-- Messages: style can be found in dropdown.less-->'],
-            [liClass: 'notifications-menu', faIcon: 'fa-warning', label: 'label-warning', number: attrs.ntfNumber, comment: '<!-- Notifications: style can be found in dropdown.less -->'],
-            [liClass: 'tasks-menu', faIcon: 'fa-tasks', label: 'label-danger', number: attrs.tskNumber, comment: '<!-- Tasks: style can be found in dropdown.less -->']
+            [liClass: 'messages-menu', faIcon: 'fa-envelope',
+                label: 'label-success', number: attrs.msgNumber,
+                comment: 'Messages: style can be found in dropdown.less'],
+            [liClass: 'notifications-menu', faIcon: 'fa-warning',
+                label: 'label-warning', number: attrs.ntfNumber,
+                comment: 'Notifications: style can be found in dropdown.less'],
+            [liClass: 'tasks-menu', faIcon: 'fa-tasks',
+                label: 'label-danger', number: attrs.tskNumber,
+                comment: 'Tasks: style can be found in dropdown.less']
         ]
         withLittleDropdowns && littleDropdowns.each{lD ->
            out << g.render(template: '/adminlte_tmpl/littleDropdown', model: lD)
