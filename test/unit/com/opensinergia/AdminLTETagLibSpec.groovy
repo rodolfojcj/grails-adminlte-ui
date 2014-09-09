@@ -302,13 +302,13 @@ class AdminLTETagLibSpec extends Specification {
     void "test header contains the toggle sidebar button"() {
         expect: "toggle pattern matches returned header"
         def togglePattern = /(?ms)/ +
-            /<header class="header">.*/ +
-            /.*<a href="#" class="navbar-btn sidebar-toggle" data-toggle="offcanvas" role="button">.*/ +
-            /.*\s<span class="sr-only">Toggle navigation<\/span>.*/ +
-            /.*\s<span class="icon-bar"><\/span>.*/ +
-            /.*\s<span class="icon-bar"><\/span>.*/ +
-            /.*\s<span class="icon-bar"><\/span>.*/ +
-            /.*<\/a>.*/ +
+            /<header class="header">.*?/ +
+            /.*?<a href="#" class="navbar-btn sidebar-toggle" data-toggle="offcanvas" role="button">.*?/ +
+            /.*?\s<span class="sr-only">Toggle navigation<\/span>.*?/ +
+            /.*?\s<span class="icon-bar"><\/span>.*?/ +
+            /.*?\s<span class="icon-bar"><\/span>.*?/ +
+            /.*?\s<span class="icon-bar"><\/span>.*?/ +
+            /.*?<\/a>.*/ +
             /<\/header>/
         (tagLib.header().toString() =~ togglePattern).size() == 1
         (applyTemplate('<altt:header />') =~ togglePattern).size() == 1
