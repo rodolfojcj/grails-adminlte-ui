@@ -381,12 +381,10 @@ class AdminLTETagLibSpec extends Specification {
         expect: "a header with no little dropdowns"
         def littleDropdownPattern = /(?ms)/ +
             /<header class="header">.*/ +
-            /.*<li class="dropdown \b.+?\b">.*/ +
-            /.*\s<a href="#" class="dropdown-toggle" data-toggle="dropdown">.*/ +
-            /.*\s<i class="fa \b.+?\b"><\/i>.*/ +
-            /.*\s<span class="label \b.+?\b">\d+<\/span>.*/ +
-            /.*<\/a>.*/ +
-            /.*<\/li>.*/ +
+            /.*\s<i class="fa \b.+?\b"><\/i>.*?/ +
+            /.*?\s<span class="label \b.+?\b">\d+<\/span>.*/ +
+            /.*<li class="dropdown user user-menu">.*?/ +
+            /.*?<ul class="dropdown-menu">.*/ +
             /<\/header>/
         (tagLib.header(withLittleDropdowns: false).toString() =~ littleDropdownPattern).size() == 0
         (tagLib.header(withLittleDropdowns: true).toString() =~ littleDropdownPattern).size() == 1
