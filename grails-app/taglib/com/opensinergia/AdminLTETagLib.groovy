@@ -124,7 +124,9 @@ class AdminLTETagLib {
             out << g.render(template: template.path, plugin: template.plugin, model: lD)
         }
         template = getTemplatePath('userDropdown')
-        out << g.render(template: template.path, plugin: template.plugin, model: [userName: attrs.userName])
+        out << g.render(template: template.path, plugin: template.plugin,
+            model: [userName: attrs.userName, userImage: attrs.userImage,
+            userTitle: attrs.userTitle, userSummary: attrs.userSummary])
         out << """
             </ul>
         </div>
