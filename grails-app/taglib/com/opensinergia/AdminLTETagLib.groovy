@@ -17,6 +17,9 @@
 
 package com.opensinergia
 
+import org.codehaus.groovy.grails.web.pages.discovery.GrailsConventionGroovyPageLocator
+import static org.codehaus.groovy.grails.io.support.GrailsResourceUtils.appendPiecesForUri
+
 /*
  * Taglib for AdminLTE related tasks
  *
@@ -24,6 +27,8 @@ package com.opensinergia
  */
 class AdminLTETagLib {
     static namespace = 'altt'
+    GrailsConventionGroovyPageLocator groovyPageLocator
+    def template
 
     // works! with the default html tags used by the nav.menu tag library
     // sadly, no customizations at all :( so no exactly what we need for AdminLTE
@@ -74,15 +79,18 @@ class AdminLTETagLib {
         // by default search form will be included, even when not specified
         def withSearchForm = true && (attrs.withSearchForm == 'true' || attrs.withSearchForm.is(Boolean.TRUE) || attrs.withSearchForm == null)
         out << '<section class="sidebar">\n'
-        out << g.render(template: '/adminlte_tmpl/userPanel',
+        template = getTemplatePath('userPanel')
+        out << g.render(template: template.path, plugin: template.plugin,
             model: [userImage: attrs.userImage, userGreeting: attrs.userGreeting ?: 'Welcome'])
-        if (withSearchForm)
-            out <<  g.render(template: "/adminlte_tmpl/sidebarForm")
+        if (withSearchForm) {
+            template = getTemplatePath('sidebarForm')
+            out << g.render(template: template.path, plugin: template.plugin)
+        }
         out << altt.sidebarMenu(attrs, body)
         out << '\n' + '</section>'
     }
 
-	// TODO: does it need to be refactored to use a GSP template?
+    // TODO: does it need to be refactored to use a GSP template?
     def header = {attrs ->
         // by default little dropdowns will be included, even when not specified
         def withLittleDropdowns = true && (attrs.withLittleDropdowns == 'true' || attrs.withLittleDropdowns.is(Boolean.TRUE) || attrs.withLittleDropdowns == null)
@@ -94,8 +102,10 @@ class AdminLTETagLib {
         ${meta(name:'app.name')}
     </a>
     <!-- Header Navbar: style can be found in header.less -->
-    <nav class="navbar navbar-static-top" role="navigation">
-        ${g.render(template: '/adminlte_tmpl/sidebarToggle')}
+    <nav class="navbar navbar-static-top" role="navigation">"""
+    template = getTemplatePath('sidebarToggle')
+    out << g.render(template: template.path, plugin: template.plugin)
+    out << """
         <div class="navbar-right">
             <ul class="nav navbar-nav">"""
         def littleDropdowns = [
@@ -110,14 +120,28 @@ class AdminLTETagLib {
                 comment: 'Tasks: style can be found in dropdown.less']
         ]
         withLittleDropdowns && littleDropdowns.each{lD ->
-           out << g.render(template: '/adminlte_tmpl/littleDropdown', model: lD)
+            template = getTemplatePath('littleDropdown')
+            out << g.render(template: template.path, plugin: template.plugin, model: lD)
         }
-        out <<  g.render(template: '/adminlte_tmpl/userDropdown', model: [userName: attrs.userName])
+        template = getTemplatePath('userDropdown')
+        out << g.render(template: template.path, plugin: template.plugin, model: [userName: attrs.userName])
         out << """
             </ul>
         </div>
     </nav>
 </header>
 """
+    }
+
+    // thanks to http://www.christianoestreich.com/2013/07/grails-plugin-template-override/
+    // see https://github.com/Grails-Plugin-Consortium/grails-filterpane/blob/master/grails-app/taglib/org/grails/plugin/filterpane/FilterPaneTagLib.groovy
+    public LinkedHashMap<String, String> getTemplatePath(String templateName) {
+        def path = appendPiecesForUri("/adminlte_tmpl", templateName) //create the url path
+        def template = [path: path] //add it to the map
+        def override = groovyPageLocator.findTemplateInBinding(path, pageScope) //check if template exists in project scope
+        if(!override) {
+            template.plugin = 'adminlte-ui' //looks like no, so use default plugin version instead
+        }
+        template  //return map
     }
 }
