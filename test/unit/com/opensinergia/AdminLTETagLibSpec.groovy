@@ -5,7 +5,7 @@ import spock.lang.Specification
 import grails.test.mixin.TestMixin
 
 import org.grails.plugin.platform.NavigationTagLib
-import org.grails.plugin.platform.navigation.NavigationItem 
+import org.grails.plugin.platform.navigation.NavigationItem
 import org.grails.plugin.platform.UiExtensionsTagLib
 
 /**
@@ -16,12 +16,6 @@ import org.grails.plugin.platform.UiExtensionsTagLib
 @TestFor(AdminLTETagLib)
 @Mock([NavigationTagLib, UiExtensionsTagLib])
 class AdminLTETagLibSpec extends Specification {
-
-    def setup() {
-    }
-
-    def cleanup() {
-    }
 
     void "test empty menu"() {
         given: "an empty navigation item"
