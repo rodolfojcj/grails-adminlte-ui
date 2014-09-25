@@ -17,8 +17,9 @@
 
 package com.opensinergia
 
-import org.codehaus.groovy.grails.web.pages.discovery.GrailsConventionGroovyPageLocator
 import static org.codehaus.groovy.grails.io.support.GrailsResourceUtils.appendPiecesForUri
+
+import org.codehaus.groovy.grails.web.pages.discovery.GrailsConventionGroovyPageLocator
 
 /*
  * Taglib for AdminLTE related tasks
@@ -77,7 +78,7 @@ class AdminLTETagLib {
 
     def sidebar = {attrs, body ->
         // by default search form will be included, even when not specified
-        def withSearchForm = true && (attrs.withSearchForm == 'true' || attrs.withSearchForm.is(Boolean.TRUE) || attrs.withSearchForm == null)
+        def withSearchForm = true && (attrs.withSearchForm == 'true' || attrs.withSearchForm.is(true) || attrs.withSearchForm == null)
         out << '<section class="sidebar">\n'
         template = getTemplatePath('userPanel')
         out << g.render(template: template.path, plugin: template.plugin,
@@ -93,7 +94,7 @@ class AdminLTETagLib {
     // TODO: does it need to be refactored to use a GSP template?
     def header = {attrs ->
         // by default little dropdowns will be included, even when not specified
-        def withLittleDropdowns = true && (attrs.withLittleDropdowns == 'true' || attrs.withLittleDropdowns.is(Boolean.TRUE) || attrs.withLittleDropdowns == null)
+        def withLittleDropdowns = true && (attrs.withLittleDropdowns == 'true' || attrs.withLittleDropdowns.is(true) || attrs.withLittleDropdowns == null)
         out << """
 <!-- header logo: style can be found in header.less -->
 <header class="header">
@@ -137,7 +138,7 @@ class AdminLTETagLib {
 
     // thanks to http://www.christianoestreich.com/2013/07/grails-plugin-template-override/
     // see https://github.com/Grails-Plugin-Consortium/grails-filterpane/blob/master/grails-app/taglib/org/grails/plugin/filterpane/FilterPaneTagLib.groovy
-    public LinkedHashMap<String, String> getTemplatePath(String templateName) {
+    private Map<String, String> getTemplatePath(String templateName) {
         def path = appendPiecesForUri("/adminlte_tmpl", templateName) //create the url path
         def template = [path: path] //add it to the map
         def override = groovyPageLocator.findTemplateInBinding(path, pageScope) //check if template exists in project scope
