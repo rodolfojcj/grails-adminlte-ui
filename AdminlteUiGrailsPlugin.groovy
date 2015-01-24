@@ -3,7 +3,6 @@ class AdminlteUiGrailsPlugin {
     def grailsVersion = "2.3 > *"
     def title = "AdminLTE UI Plugin"
     def author = "Rodolfo Castellanos"
-    def authorEmail = "rodolfojcj at yahoo dot com"
     def description = '''\
 Installs AdminLTE, a fully responsive admin template, developed by Almsaeed Studio.
 AdminLTE is based on Bootstrap 3 framework and several plugins to offer a very nice UI.
