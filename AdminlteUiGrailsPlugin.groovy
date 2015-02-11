@@ -1,5 +1,5 @@
 class AdminlteUiGrailsPlugin {
-    def version = "0.1-SNAPSHOT"
+    def version = "0.1.0"
     def grailsVersion = "2.3 > *"
     def title = "AdminLTE UI Plugin"
     def author = "Rodolfo Castellanos"
