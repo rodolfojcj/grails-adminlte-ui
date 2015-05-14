@@ -14,6 +14,20 @@ Thanks a lot to all the developers of these mentioned projects! They have done a
 
 Right now _adminlte-ui_ offers a minimal and very basic functionality.
 
+Dependency on Resources plugin
+------------------------------
+
+Given that _adminlte-ui_ depends _Grails Platform Core_ plugin, which in turn
+depends on [Resources plugin](http://grails.org/plugin/resources), your project
+will need to use the _resources_ plugin. This have been briefly tested to work
+with Grails versions 2.3.x, 2.4.x and 2.5.x
+
+Since Grails version 2.4.x the [Asset Pipeline](http://grails.org/plugin/asset-pipeline)
+plugin is now favored, instead of the already mentioned Resources plugin, but
+_adminlte-ui_ is not ready to use the _Asset Pipeline_ plugin. Eventually, when
+_Grails Platform Core_ is updated to work with the _Asset Pipeline_ it will be
+worth to also adapt and upate _adminlte-ui_.
+
 Simplest Example
 ----------------
 
@@ -24,6 +38,7 @@ Supposing you have just created a Grails application, with these little changes 
 ```
         plugins {
             // ...
+            runtime ':resources:1.2.14'
             runtime ':adminlte-ui:0.1.0'
             // ...
         }
